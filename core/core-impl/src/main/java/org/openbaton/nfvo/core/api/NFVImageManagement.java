@@ -18,9 +18,9 @@
 package org.openbaton.nfvo.core.api;
 
 import java.util.Date;
-import org.openbaton.catalogue.nfvo.images.BaseNfvImage;
 import org.openbaton.catalogue.nfvo.images.NFVImage;
-import org.openbaton.nfvo.repositories.ImageRepository;
+import org.openbaton.exceptions.NotFoundException;
+import org.openbaton.nfvo.repositories.NFVImageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,36 +33,51 @@ public class NFVImageManagement implements org.openbaton.nfvo.core.interfaces.NF
 
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-  @Autowired private ImageRepository imageRepository;
+  @Autowired private NFVImageRepository nfvImageRepository;
 
   @Override
   public NFVImage add(NFVImage NFVImage) {
     log.trace("Adding image " + NFVImage);
     log.debug("Adding image with name " + NFVImage.getName());
-    return imageRepository.save(NFVImage);
+    return nfvImageRepository.save(NFVImage);
   }
 
   @Override
   public void delete(String id) {
-    log.debug("Removing image with id " + id);
-    imageRepository.delete(id);
+    log.debug("Removing image with ID " + id);
+    nfvImageRepository.delete(id);
+  }
+
+  @Override
+  public void delete(String id, String projectId) throws NotFoundException {
+    log.debug("Removing image with ID " + id + " from project with ID " + projectId);
+    if (nfvImageRepository.findOneByIdAndProjectId(id, projectId) != null)
+      nfvImageRepository.delete(id);
+    else
+      throw new NotFoundException(
+          "NFVImage with ID " + id + " was not found in project with ID " + projectId);
   }
 
   @Override
   public NFVImage update(NFVImage nfvImage, String id) {
-    nfvImage = imageRepository.save(nfvImage);
+    nfvImage = nfvImageRepository.save(nfvImage);
     nfvImage.setUpdated(new Date());
     return nfvImage;
   }
 
   @Override
-  public Iterable<BaseNfvImage> query() {
-    return imageRepository.findAll();
+  public Iterable<NFVImage> query() {
+    return nfvImageRepository.findAll();
   }
 
   @Override
-  public BaseNfvImage query(String id) {
-    return imageRepository.findOne(id);
+  public NFVImage query(String id) {
+    return nfvImageRepository.findOne(id);
+  }
+
+  @Override
+  public Iterable<NFVImage> queryByProjectId(String projectId) {
+    return nfvImageRepository.findAllByProjectId(projectId);
   }
 
   @Override

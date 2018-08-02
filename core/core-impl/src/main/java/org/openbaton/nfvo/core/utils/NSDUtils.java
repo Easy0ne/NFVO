@@ -45,9 +45,6 @@ import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.catalogue.nfvo.VnfmManagerEndpoint;
-import org.openbaton.catalogue.nfvo.images.BaseNfvImage;
-import org.openbaton.catalogue.nfvo.images.DockerImage;
-import org.openbaton.catalogue.nfvo.images.NFVImage;
 import org.openbaton.catalogue.nfvo.viminstances.BaseVimInstance;
 import org.openbaton.catalogue.nfvo.viminstances.OpenstackVimInstance;
 import org.openbaton.exceptions.CyclicDependenciesException;
@@ -73,7 +70,6 @@ public class NSDUtils {
 
   @Autowired private VimRepository vimRepository;
   @Autowired private VnfPackageRepository vnfPackageRepository;
-  @Autowired private VimRepository vimInstanceRepository;
   @Autowired private VNFDRepository vnfdRepository;
 
   @Value("${nfvo.integrity.nsd.checks:in-all-vims}")
@@ -501,9 +497,6 @@ public class NSDUtils {
               checkIntegrityScaleInOut(virtualNetworkFunctionDescriptor, virtualDeploymentUnit);
 
               checkFlavourIntegrity(virtualNetworkFunctionDescriptor, vimInstance);
-
-              checkIntegrityImages(
-                  virtualNetworkFunctionDescriptor, virtualDeploymentUnit, vimInstance);
             }
           } else {
             log.warn(
@@ -744,43 +737,6 @@ public class NSDUtils {
       }
     } else {
       log.warn("vnfPackageLocation is null. Are you sure?");
-    }
-  }
-
-  private void checkIntegrityImages(
-      VirtualNetworkFunctionDescriptor virtualNetworkFunctionDescriptor,
-      VirtualDeploymentUnit virtualDeploymentUnit,
-      BaseVimInstance vimInstance)
-      throws NetworkServiceIntegrityException {
-    Set<String> imageNames = new HashSet<>();
-    Set<String> imageIds = new HashSet<>();
-    for (BaseNfvImage image : vimInstance.getImages()) {
-      if (image instanceof NFVImage) imageNames.add(((NFVImage) image).getName());
-      else if (image instanceof DockerImage) imageNames.addAll(((DockerImage) image).getTags());
-      imageIds.add(image.getExtId());
-    }
-
-    if (virtualDeploymentUnit.getVm_image() != null) {
-      boolean found = false;
-      for (String image : virtualDeploymentUnit.getVm_image()) {
-        log.debug("Checking image: " + image);
-        if (imageNames.contains(image) || imageIds.contains(image)) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        throw new NetworkServiceIntegrityException(
-            "Regarding the VirtualNetworkFunctionDescriptor "
-                + virtualNetworkFunctionDescriptor.getName()
-                + ": in one of the VirtualDeploymentUnit, none of the images "
-                + virtualDeploymentUnit.getVm_image()
-                + " is not contained into the images of the vimInstance "
-                + "chosen. Please choose one from: "
-                + imageNames
-                + " or from "
-                + imageIds);
-      }
     }
   }
 

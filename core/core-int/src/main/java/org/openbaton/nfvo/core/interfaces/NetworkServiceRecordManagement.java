@@ -206,5 +206,5 @@ public interface NetworkServiceRecordManagement {
   VirtualNetworkFunctionRecord restartVnfr(
       NetworkServiceRecord nsr, String vnfrId, String imageName, String projectId)
       throws NotFoundException, IOException, BadRequestException, VimException, PluginException,
-          ExecutionException, InterruptedException, BadFormatException;
+          ExecutionException, InterruptedException, BadFormatException, VimDriverException;
 }

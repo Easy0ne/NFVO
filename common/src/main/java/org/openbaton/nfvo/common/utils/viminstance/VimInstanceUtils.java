@@ -161,16 +161,6 @@ public class VimInstanceUtils {
 
   public static Collection<BaseNfvImage> findActiveImagesByName(
       BaseVimInstance vimInstance, String imageName) {
-    List<BaseNfvImage> stream =
-        vimInstance
-            .getImages()
-            .stream()
-            .filter(i -> i.getExtId().equals(imageName))
-            .collect(Collectors.toList());
-    if (stream.size() > 0) {
-      return stream;
-    }
-
     if (vimInstance instanceof OpenstackVimInstance) {
       return ((OpenstackVimInstance) vimInstance)
           .getImages()

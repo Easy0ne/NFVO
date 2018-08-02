@@ -17,33 +17,67 @@
 
 package org.openbaton.nfvo.core.interfaces;
 
-import org.openbaton.catalogue.nfvo.images.BaseNfvImage;
 import org.openbaton.catalogue.nfvo.images.NFVImage;
+import org.openbaton.exceptions.NotFoundException;
 
-/** Created by mpa on 30/04/15. */
+/** This interface is only responsible for managing NFVImages. */
 public interface NFVImageManagement {
 
-  /** This operation allows adding new VNF software images to the image repository. */
+  /**
+   * This method adds an NFVImage to the NfvImageRepository.
+   *
+   * @param NFVImage
+   * @return
+   */
   NFVImage add(NFVImage NFVImage);
 
-  /** This operation allows deleting in the VNF software images from the image repository. */
+  /**
+   * This method removes an NFVImage from the NfvImageRepository.
+   *
+   * @param id
+   */
   void delete(String id);
 
-  /** This operation allows updating the VNF software images in the image repository. */
+  /**
+   * This method removes an NFVImage from the NfvImageRepository and checks if the image has the
+   * given project ID.
+   *
+   * @param id
+   */
+  void delete(String id, String projectId) throws NotFoundException;
+
+  /**
+   * This method updates an existing NFVImage.
+   *
+   * @param new_NFV_image
+   * @param id
+   * @return
+   */
   NFVImage update(NFVImage new_NFV_image, String id);
 
   /**
-   * This operation allows querying the information of the VNF software images in the image
-   * repository.
+   * This method returns all the NFVImages.
+   *
+   * @return
    */
-  Iterable<BaseNfvImage> query();
+  Iterable<NFVImage> query();
 
   /**
-   * This operation allows querying the information of the VNF software image in the image
-   * repository.
+   * This method returns an NFVImage specified by the ID.
+   *
+   * @param id
+   * @return
    */
-  BaseNfvImage query(String id);
+  NFVImage query(String id);
 
-  /** This operation allows copying images from a VIM to another. */
+  /**
+   * This method returns all the NFVImages with a specific project ID.
+   *
+   * @param projectId
+   * @return
+   */
+  Iterable<NFVImage> queryByProjectId(String projectId);
+
+  /** This method allows copying images from a VIM to another. */
   void copy();
 }

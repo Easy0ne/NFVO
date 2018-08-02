@@ -17,6 +17,7 @@
 
 package org.openbaton.vim_impl.vim;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.openbaton.catalogue.mano.common.DeploymentFlavour;
 import org.openbaton.catalogue.mano.common.Ip;
@@ -49,7 +51,10 @@ import org.openbaton.exceptions.PluginException;
 import org.openbaton.exceptions.VimDriverException;
 import org.openbaton.exceptions.VimException;
 import org.openbaton.nfvo.common.utils.viminstance.VimInstanceUtils;
+import org.openbaton.nfvo.core.interfaces.VimManagement;
+import org.openbaton.nfvo.repositories.NFVImageRepository;
 import org.openbaton.nfvo.vim_interfaces.vim.Vim;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
@@ -60,6 +65,12 @@ import org.springframework.stereotype.Service;
 @Service
 @Scope(value = "prototype")
 public class GenericVIM extends Vim {
+
+  @Autowired private NFVImageRepository nfvImageRepository;
+  @Autowired private VimManagement vimManagement;
+
+  // used to prevent the simultaneous upload of the same image to one VIM
+  private static final Map<String, Object> uploadImageLockMap = new HashMap<>();
 
   public GenericVIM(
       String type,
@@ -84,6 +95,8 @@ public class GenericVIM extends Vim {
         pluginName,
         pluginTimeout,
         port);
+    nfvImageRepository = context.getBean("nfvImageRepository", NFVImageRepository.class);
+    vimManagement = context.getBean("vimManagement", VimManagement.class);
   }
 
   public GenericVIM() {}
@@ -901,7 +914,8 @@ public class GenericVIM extends Vim {
   }
 
   private String chooseImage(Collection<String> vmImages, BaseVimInstance vimInstance)
-      throws VimException {
+      throws VimException, PluginException, IOException, ExecutionException, InterruptedException,
+          VimDriverException {
     log.debug("Choosing Image...");
     log.debug("Requested: " + vmImages);
 
@@ -912,6 +926,59 @@ public class GenericVIM extends Vim {
             VimInstanceUtils.findActiveImagesByName(vimInstance, imageName).stream().findFirst();
         if (extId.isPresent()) {
           return extId.get().getExtId();
+        }
+        if (vimInstance instanceof OpenstackVimInstance) {
+          List<NFVImage> imagesInRepo =
+              nfvImageRepository.findAllByNameAndProjectIdAndIsInImageRepoIsTrue(
+                  imageName, vimInstance.getProjectId());
+          if (!imagesInRepo.isEmpty()) {
+            NFVImage imageToUpload = imagesInRepo.get(0);
+            if (imageToUpload.getUrl() != null && !imageToUpload.getUrl().equals("")) {
+              try {
+                Object lock;
+                String key = String.format("%s%s", vimInstance.getId(), imageToUpload.getId());
+                synchronized (uploadImageLockMap) {
+                  lock = uploadImageLockMap.computeIfAbsent(key, k -> new Object());
+                }
+                synchronized (lock) {
+                  vimInstance = vimManagement.refresh(vimInstance, true).get();
+                  extId =
+                      VimInstanceUtils.findActiveImagesByName(vimInstance, imageName)
+                          .stream()
+                          .findFirst();
+                  if (extId.isPresent()) {
+                    return extId.get().getExtId();
+                  }
+                  log.info(
+                      "Uploading image "
+                          + imageName
+                          + " ("
+                          + imageToUpload.getId()
+                          + ") to VIM "
+                          + vimInstance.getName()
+                          + " ("
+                          + vimInstance.getId()
+                          + ")");
+                  return client
+                      .addImage(vimInstance, imageToUpload, imageToUpload.getUrl())
+                      .getExtId();
+                }
+              } catch (VimDriverException e) {
+                log.error(
+                    "Exception while uploading image "
+                        + imageName
+                        + " ("
+                        + imageToUpload.getId()
+                        + ") to VIM "
+                        + vimInstance.getName()
+                        + " ("
+                        + vimInstance.getId()
+                        + "): "
+                        + e.getMessage());
+                throw e;
+              }
+            }
+          }
         }
       }
       throw new VimException(
@@ -975,7 +1042,8 @@ public class GenericVIM extends Vim {
       VirtualDeploymentUnit vdu,
       VNFCInstance vnfcInstance,
       String operation)
-      throws VimException {
+      throws VimException, InterruptedException, IOException, ExecutionException, PluginException,
+          VimDriverException {
     switch (operation) {
       case "rebuild":
         String imageId = this.chooseImage(vdu.getVm_image(), vimInstance);
@@ -1394,7 +1462,8 @@ public class GenericVIM extends Vim {
       String userdata,
       Map<String, String> floatingIps,
       Set<Key> keys)
-      throws VimException {
+      throws VimException, InterruptedException, IOException, ExecutionException, PluginException,
+          VimDriverException {
     log.debug("Launching new VM on VimInstance: " + vimInstance.getName());
     log.debug("VDU is : " + vdu.getName());
     log.debug("VNFR is : " + vnfr.getName());

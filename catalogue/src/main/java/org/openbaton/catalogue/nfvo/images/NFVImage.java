@@ -35,6 +35,10 @@ public class NFVImage extends BaseNfvImage {
   private String diskFormat;
   private String containerFormat;
 
+  private String url;
+
+  private boolean isInImageRepo;
+
   @Temporal(TemporalType.TIMESTAMP)
   private Date updated;
 
@@ -116,6 +120,22 @@ public class NFVImage extends BaseNfvImage {
     return status;
   }
 
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
+  }
+
+  public boolean isInImageRepo() {
+    return isInImageRepo;
+  }
+
+  public void setInImageRepo(boolean inImageRepo) {
+    isInImageRepo = inImageRepo;
+  }
+
   public void setStatus(String status) {
     if (status == null) this.status = ImageStatus.UNRECOGNIZED;
     else {
@@ -157,6 +177,10 @@ public class NFVImage extends BaseNfvImage {
         + updated
         + ", status="
         + status
+        + ", url="
+        + url
+        + ", isInImageRepo="
+        + isInImageRepo
         + "} "
         + super.toString();
   }

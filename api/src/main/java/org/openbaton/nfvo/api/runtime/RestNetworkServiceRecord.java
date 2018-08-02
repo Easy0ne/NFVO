@@ -797,7 +797,8 @@ public class RestNetworkServiceRecord {
       @PathVariable("idVnfr") String vnfrId,
       @RequestHeader(value = "project-id") String projectId)
       throws NotFoundException, InterruptedException, BadRequestException, AlreadyExistingException,
-          VimException, ExecutionException, PluginException, IOException, BadFormatException {
+          VimException, ExecutionException, PluginException, IOException, BadFormatException,
+          VimDriverException {
     log.debug("Received request for restarting a VNFR");
     if (!body.has("imageName") || !body.getAsJsonPrimitive("imageName").isString())
       throw new BadRequestException(
