@@ -27,54 +27,54 @@ import org.openbaton.exceptions.VimException;
 /** Created by mpa on 30/04/15. */
 public interface NetworkManagement {
 
-    /**
-     * Add a network to a VIM instance.
-     *
-     * @param vimInstance
-     * @param network
-     * @return
-     * @throws VimException
-     * @throws PluginException
-     * @throws BadRequestException
-     */
+  /**
+   * Add a network to a VIM instance.
+   *
+   * @param vimInstance
+   * @param network
+   * @return
+   * @throws VimException
+   * @throws PluginException
+   * @throws BadRequestException
+   */
   BaseNetwork add(BaseVimInstance vimInstance, BaseNetwork network)
       throws VimException, PluginException, BadRequestException;
 
-    /**
-     * Delete a network from a VIM instance.
-     *
-     * @param vimInstance
-     * @param network
-     * @throws VimException
-     * @throws PluginException
-     */
+  /**
+   * Delete a network from a VIM instance.
+   *
+   * @param vimInstance
+   * @param network
+   * @throws VimException
+   * @throws PluginException
+   */
   void delete(BaseVimInstance vimInstance, BaseNetwork network)
       throws VimException, PluginException;
 
-    /**
-     * Update an existing network on a VIM instance.
-     *
-     * @param vimInstance
-     * @param new_network
-     * @return
-     * @throws VimException
-     * @throws PluginException
-     */
+  /**
+   * Update an existing network on a VIM instance.
+   *
+   * @param vimInstance
+   * @param new_network
+   * @return
+   * @throws VimException
+   * @throws PluginException
+   */
   BaseNetwork update(BaseVimInstance vimInstance, Network new_network)
       throws VimException, PluginException;
 
-    /**
-     * Return all networks.
-     *
-     * @return
-     */
+  /**
+   * Return all networks.
+   *
+   * @return
+   */
   Iterable<BaseNetwork> query();
 
-    /**
-     * Return a network specified by its ID.
-     *
-     * @param id
-     * @return
-     */
+  /**
+   * Return a network specified by its ID.
+   *
+   * @param id
+   * @return
+   */
   BaseNetwork query(String id);
 }

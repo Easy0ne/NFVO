@@ -21,24 +21,24 @@ import org.openbaton.catalogue.nfvo.VnfmManagerEndpoint;
 
 public interface VNFManagerManagement {
   /**
-   * Returns the list of VNFManagers registered
+   * Returns the registered VnfmManagerEndpoints.
    *
-   * @return Iterable<VnfmManagerEndpoint>
+   * @return all registered VnfmManagerEndpoints
    */
   Iterable<VnfmManagerEndpoint> query();
 
   /**
-   * Returns the VnfmManagerEndpoint selected by id
+   * Returns the VnfmManagerEndpoint selected by ID.
    *
-   * @param id of VnfmManagerEndpoint
-   * @return VnfmManagerEndpoint
+   * @param id the ID of the requested VnfmManagerEndpoint
+   * @return the requested VnfmManagerEndpoint
    */
   VnfmManagerEndpoint query(String id);
 
   /**
-   * Delete the Vnfm selected by id
+   * Delete the VnfmManagerEndpoint selected by ID.
    *
-   * @param id of the Vnfm
+   * @param id of the VnfmManagerEndpoint to remove
    */
   void delete(String id);
 }

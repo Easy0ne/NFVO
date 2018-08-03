@@ -66,13 +66,13 @@ public interface ConfigurationManagement {
    */
   Iterable<Configuration> queryByProject(String projectId);
 
-    /**
-     * This operation allows retrieving a specific configuration from the configuration repository.
-     *
-     * @param id the ID of the requested configuration
-     * @param projectId the ID of the project
-     * @return the configuration
-     */
+  /**
+   * This operation allows retrieving a specific configuration from the configuration repository.
+   *
+   * @param id the ID of the requested configuration
+   * @param projectId the ID of the project
+   * @return the configuration
+   */
   Configuration query(String id, String projectId);
 
   /**

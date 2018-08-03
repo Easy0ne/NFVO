@@ -23,17 +23,17 @@ import org.openbaton.catalogue.mano.descriptor.VNFComponent;
 public interface VNFComponentManagment {
 
   /**
-   * Returns the list of VNFComponents
+   * Returns all VNFComponents.
    *
-   * @return Iterable<VNFComponent>
+   * @return all VNFComponents
    */
   Iterable<VNFComponent> query();
 
   /**
-   * Returns the VNFComponent selected by id
+   * Returns a VNFComponent specified by ID.
    *
-   * @param id of VNFComponent
-   * @return VNFComponent
+   * @param id the ID of the requested VNFComponent
+   * @return the VNFComponent
    */
   VNFComponent query(String id);
 }

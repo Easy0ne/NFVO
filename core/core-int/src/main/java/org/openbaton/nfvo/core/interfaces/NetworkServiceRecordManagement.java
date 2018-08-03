@@ -116,14 +116,19 @@ public interface NetworkServiceRecordManagement {
   void deleteVNFDependency(String idNsr, String idVnfd, String projectId) throws NotFoundException;
 
   /**
-   * This method will add a {@link VNFCInstance} into a NetworkServiceRecord to a specific
-   * VirtualDeploymentUnit of a specific VirtualNetworkFunctionRecord
+   * This method will add a {@link VNFCInstance} to a specific VirtualDeploymentUnit of a specific
+   * VirtualNetworkFunctionRecord in a NetworkServiceRecord.
    *
    * @param id of the NetworkServiceRecord
    * @param idVnf of the VirtualNetworkFunctionRecord
    * @param idVdu of the VirtualDeploymentUnit chosen
-   * @param vimInstanceNames
-   * @return the new VNFCInstance
+   * @param component the VNFComponent from which the VNFCInstance is created
+   * @param mode mode for the OrVnfmScalingMessage
+   * @param projectId the project ID
+   * @param vimInstanceNames the names of VIM instances to which the VNFCInstance shall be added
+   * @throws NotFoundException if the VIM names do not refer to existing VIM instances
+   * @throws BadFormatException if there are mistakes in the request
+   * @throws WrongStatusException if the chosen VDU has reached the maximum number of VNFCInstances
    */
   void addVNFCInstance(
       String id,
