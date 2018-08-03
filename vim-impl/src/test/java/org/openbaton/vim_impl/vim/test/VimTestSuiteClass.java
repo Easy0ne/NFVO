@@ -24,6 +24,7 @@ import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -52,6 +53,7 @@ import org.openbaton.catalogue.nfvo.images.NFVImage;
 import org.openbaton.catalogue.nfvo.networks.Network;
 import org.openbaton.catalogue.nfvo.viminstances.BaseVimInstance;
 import org.openbaton.catalogue.nfvo.viminstances.OpenstackVimInstance;
+import org.openbaton.exceptions.PluginException;
 import org.openbaton.exceptions.VimDriverException;
 import org.openbaton.exceptions.VimException;
 import org.openbaton.nfvo.vim_interfaces.vim.Vim;
@@ -141,7 +143,9 @@ public class VimTestSuiteClass {
   }
 
   @Test
-  public void testVimOpenstack() throws VimDriverException, VimException {
+  public void testVimOpenstack()
+      throws VimDriverException, VimException, InterruptedException, ExecutionException,
+          PluginException, IOException {
     VirtualDeploymentUnit vdu = createVDU();
     VirtualNetworkFunctionRecord vnfr = createVNFR();
 
@@ -177,7 +181,7 @@ public class VimTestSuiteClass {
       String expectedId = id.get().getVc_id();
       log.debug(expectedId + " == " + environment.getProperty("mocked_id"));
       Assert.assertEquals(expectedId, environment.getProperty("mocked_id"));
-    } catch (VimException | ExecutionException | InterruptedException e) {
+    } catch (VimException | ExecutionException | InterruptedException | PluginException e) {
       e.printStackTrace();
       Assert.fail();
     }

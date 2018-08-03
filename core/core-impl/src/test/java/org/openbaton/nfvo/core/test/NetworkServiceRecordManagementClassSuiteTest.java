@@ -67,13 +67,7 @@ import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.catalogue.nfvo.VnfmManagerEndpoint;
 import org.openbaton.catalogue.nfvo.viminstances.BaseVimInstance;
 import org.openbaton.catalogue.nfvo.viminstances.OpenstackVimInstance;
-import org.openbaton.exceptions.AlreadyExistingException;
-import org.openbaton.exceptions.BadFormatException;
-import org.openbaton.exceptions.BadRequestException;
-import org.openbaton.exceptions.NotFoundException;
-import org.openbaton.exceptions.PluginException;
-import org.openbaton.exceptions.VimException;
-import org.openbaton.exceptions.WrongStatusException;
+import org.openbaton.exceptions.*;
 import org.openbaton.nfvo.core.api.ConfigurationManagement;
 import org.openbaton.nfvo.core.api.NetworkServiceRecordManagement;
 import org.openbaton.nfvo.core.api.VimManagement;
@@ -130,7 +124,8 @@ public class NetworkServiceRecordManagementClassSuiteTest {
 
   @Before
   public void init()
-      throws ExecutionException, InterruptedException, VimException, PluginException, IOException {
+      throws ExecutionException, InterruptedException, VimException, PluginException, IOException,
+          VimDriverException {
     MockitoAnnotations.initMocks(this);
     BaseVimInstance vimInstance = createVimInstance();
     VirtualNetworkFunctionDescriptor virtualNetworkFunctionRecord =

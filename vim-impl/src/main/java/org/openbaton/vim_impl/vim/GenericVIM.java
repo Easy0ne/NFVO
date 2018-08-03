@@ -95,7 +95,7 @@ public class GenericVIM extends Vim {
         pluginName,
         pluginTimeout,
         port);
-    nfvImageRepository = context.getBean("nfvImageRepository", NFVImageRepository.class);
+    nfvImageRepository = context.getBean("NFVImageRepository", NFVImageRepository.class);
     vimManagement = context.getBean("vimManagement", VimManagement.class);
   }
 

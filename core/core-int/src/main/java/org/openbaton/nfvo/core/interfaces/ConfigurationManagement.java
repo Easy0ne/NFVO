@@ -23,32 +23,64 @@ import org.openbaton.exceptions.NotFoundException;
 /** Created by lto on 13/05/15. */
 public interface ConfigurationManagement {
 
-  /** This operation allows adding a datacenter into the datacenter repository. */
-  Configuration add(Configuration datacenter);
+  /**
+   * This operation allows adding a configuration into the configuration repository.
+   *
+   * @param configuration the configuration to add
+   * @return the added configuration
+   */
+  Configuration add(Configuration configuration);
 
-  /** This operation allows deleting the datacenter from the datacenter repository. */
+  /**
+   * This operation allows deleting the configuration from the configuration repository.
+   *
+   * @param id the ID of the configuration to remove
+   */
   void delete(String id);
 
-  /** This operation allows updating the datacenter in the datacenter repository. */
-  Configuration update(Configuration new_datacenter, String id, String projectId)
+  /**
+   * This operation allows updating a configuration in the configuration repository.
+   *
+   * @param newConfiguration the updated configuration
+   * @param id the ID of the configuration to update
+   * @param projectId the ID of the project
+   * @return the updated configuration
+   * @throws NotFoundException if the configuration to update does not exist
+   */
+  Configuration update(Configuration newConfiguration, String id, String projectId)
       throws NotFoundException;
 
   /**
-   * This operation allows querying the information of the datacenters in the datacenter repository.
+   * This operation allows retrieving all configurations from the configuration repository.
+   *
+   * @return all the configurations
    */
   Iterable<Configuration> query();
 
+  /**
+   * This operation allows retrieving all configurations belonging to a specific project from the
+   * configuration repository.
+   *
+   * @param projectId the ID of the project
+   * @return all the configurations belonging to the specified project
+   */
   Iterable<Configuration> queryByProject(String projectId);
 
-  /**
-   * This operation allows querying the information of the datacenter in the datacenter repository.
-   */
+    /**
+     * This operation allows retrieving a specific configuration from the configuration repository.
+     *
+     * @param id the ID of the requested configuration
+     * @param projectId the ID of the project
+     * @return the configuration
+     */
   Configuration query(String id, String projectId);
 
   /**
-   * @param system
-   * @return
-   * @throws NotFoundException
+   * This operation allows retrieving a specific configuration by name.
+   *
+   * @param name the name of the requested configuration
+   * @return the configuration
+   * @throws NotFoundException if no configuration with this name exists
    */
-  Configuration queryByName(String system) throws NotFoundException;
+  Configuration queryByName(String name) throws NotFoundException;
 }
